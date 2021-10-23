@@ -8,6 +8,7 @@ base_dir = '/sys/bus/w1/devices/'
 device_folder = glob.glob(base_dir + '28*')[0]
 device_file = device_folder + '/w1_slave'
 
+
 def get_sensors():
     base_dir = '/sys/bus/w1/devices/'
     sensors = {}
@@ -17,12 +18,14 @@ def get_sensors():
         print(f"sensor address:{expr.match(df).group(1)}")
         sensors[expr.match(df).group(1)] = df
     return sensors
-        
+
+
 def get_sensor_raw(sensors, address):
     with open(sensors[address] + '/w1_slave', 'r') as f:
         lines = f.readlines()
         return lines
-    
+
+
 def get_sensor_temp(sensors, address):
     lines = get_sensor_raw(sensors, address)
     while lines[0].strip()[-3:] != 'YES':
@@ -33,12 +36,14 @@ def get_sensor_temp(sensors, address):
         temp_string = lines[1][equals_pos+2:]
         temp_c = float(temp_string) / 1000.0
         return temp_c
-    
+
+
 def read_temp_raw():
     f = open(device_file, 'r')
     lines = f.readlines()
     f.close()
     return lines
+
 
 def read_temp():
     lines = read_temp_raw()
@@ -50,6 +55,7 @@ def read_temp():
         temp_string = lines[1][equals_pos+2:]
         temp_c = float(temp_string) / 1000.0
         return temp_c
+
 
 sensors = get_sensors()
 while True:
