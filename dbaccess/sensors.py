@@ -126,7 +126,7 @@ class DbSensor(DbBaseObject):
 
 class DbDS18B20Sensor(DbSensor):
     def __init__(self, connection, address):
-        super().__init__(connection, 'SD18B20', address)
+        super().__init__(connection, 'DS18B20', address)
 
 
 if __name__ == "__main__":
