@@ -5,9 +5,20 @@ import time
 import re
 
 
-class DS18B20(object):
-    def __init__(self, address, device_path):
+class TempSensor(object):
+    def __init__(self, address):
         self.address = address
+
+    def get_address(self):
+        return self.address
+
+    def get_sensor_temp(self):
+        raise Exception("NotImplementedError")
+
+
+class DS18B20(TempSensor):
+    def __init__(self, address, device_path):
+        super().__init__(address)
         self.device_path = device_path
 
     @staticmethod
@@ -28,9 +39,6 @@ class DS18B20(object):
     def new_sensor(address, device_path):
         print(f"  Creating sensor {address} : {device_path}")
         return DS18B20(address, device_path)
-
-    def get_address(self):
-        return self.address
 
     def get_sensor_raw(self):
         print(f"  Read sensor {self.address} ")
