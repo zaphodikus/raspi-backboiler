@@ -24,11 +24,12 @@ class DS18B20(object):
             sensors[expr.match(df).group(1)] = df
         return sensors
 
-    def new_sensor(self, address, device_path):
+    @staticmethod
+    def new_sensor(address, device_path):
         print(f"  Creating sensor {address} : {device_path}")
         return DS18B20(address, device_path)
 
-    def address(self):
+    def get_address(self):
         return self.address
 
     def get_sensor_raw(self):
