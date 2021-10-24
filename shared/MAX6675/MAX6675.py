@@ -2,6 +2,7 @@ import board
 import busio
 import digitalio
 import time
+import sys
 from shared.DS18B20.ds18b20 import TempSensor
 
 class MAX6675(TempSensor):
@@ -57,4 +58,4 @@ class MAX6675(TempSensor):
         value = self.raw[0] << 8 | self.raw[1]
         # print('Raw value: 0x{0:08X}'.format(value & 0xFFFFFFFF))
         # convert to a temperature
-        return self.convert(value)
+        return self.convert_celcius(value)
