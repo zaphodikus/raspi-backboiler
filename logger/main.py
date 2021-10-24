@@ -3,7 +3,11 @@
 from math import sin, radians
 from datetime import datetime, timedelta
 import time
-from deadband import DeadbandBase
+import os
+import sys
+from pathlib import Path
+sys.path.append(str(Path(os.getcwd()).parent))
+from shared.logger.deadband import DeadbandBase
 
 
 def sine_source():

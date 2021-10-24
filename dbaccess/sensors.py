@@ -129,6 +129,11 @@ class DbDS18B20Sensor(DbSensor):
         super().__init__(connection, 'DS18B20', address)
 
 
+class DbMAX6675Sensor(DbSensor):
+    def __init__(self, connection, address):
+        super().__init__(connection, 'MAX6675', address)
+
+
 if __name__ == "__main__":
     db = DbSensorDatabase()
     sensors = []
