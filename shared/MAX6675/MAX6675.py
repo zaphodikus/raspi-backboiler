@@ -11,7 +11,8 @@ class MAX6675(TempSensor):
 
         :param cs_pin: The pin to use for SPI chip select
         """
-        super().__init__(f"spi{cs_pin}")  # use the CS pin as an SPI 'address'
+        super().__init__(f"spi_CSPIN_{cs_pin}")  # use the CS pin as an SPI 'address'
+        print(f"  Creating MAX6675 {self.get_address()} on SPI")
         self._chip_select = cs_pin
         self.cs = digitalio.DigitalInOut(self._chip_select)  # normally GPIO 5
         self.cs.direction = digitalio.Direction.OUTPUT

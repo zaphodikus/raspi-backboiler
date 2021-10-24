@@ -37,16 +37,20 @@ class DS18B20(TempSensor):
 
     @staticmethod
     def new_sensor(address, device_path):
-        print(f"  Creating sensor {address} : {device_path}")
+        print(f"  Creating DB18B20 {address} : {device_path}")
         return DS18B20(address, device_path)
 
     def get_sensor_raw(self):
-        print(f"  Read sensor {self.address} ")
+        #print(f"  Read sensor {self.address} ")
         with open(self.device_path + '/w1_slave', 'r') as f:
             lines = f.readlines()
             return lines
 
     def get_sensor_temp(self):
+        """
+        Note: DS18B20 takes about 900 ms to read the file, so this has
+        to be background tasked
+        """
         lines = self.get_sensor_raw()
         while lines[0].strip()[-3:] != 'YES':
             time.sleep(0.2)

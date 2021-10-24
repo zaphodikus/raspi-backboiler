@@ -63,6 +63,10 @@ todo: configuration notes
  sudo pip3 install --upgrade setuptools
  
  pip3 install adafruit_blinka
+ :: Required to install since numpy wants some c library called 
+ ::  libf77blas.so.3
+ sudo apt-get install libatlas-base-dev
+ pip3 install pandas
  pip3 install matplotlib
  pip3 install seaborn
 ```
