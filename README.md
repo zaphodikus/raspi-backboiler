@@ -69,6 +69,13 @@ todo: configuration notes
  pip3 install pandas
  pip3 install matplotlib
  pip3 install seaborn
+ pip install flask
+```
+Flask app setup
+```
+export FLASK_APP=test.py
+export FLASK_ENV=development
+
 ```
 ## Google docs Integration
 (todo)
