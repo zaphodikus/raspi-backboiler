@@ -70,6 +70,7 @@ todo: configuration notes
  pip3 install matplotlib
  pip3 install seaborn
  pip install flask
+ pip install psutil
 ```
 Flask app setup
 ```
