@@ -6,11 +6,14 @@ class DbBaseObject(object):
     """
     Wrapper/helper object for a record
     """
-    def __init__(self, connection, tablename, fields):
+    def __init__(self, connection, tablename, fields, clear=False):
         self.con = connection
         cursorObj = connection.cursor()
         self.tablename = tablename
         self.fields = fields
+        if clear:
+            _clear_qry = f"drop table if exists {self.tablename}"
+            cursorObj.execute(_clear_qry)
         _create_qry = f"create table if not exists {self.tablename}({', '.join(self.fields)})"
         cursorObj.execute(_create_qry)
         connection.commit()
