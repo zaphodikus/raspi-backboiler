@@ -54,6 +54,15 @@ class Stats(object):
             return disk.free, disk.total
         return 42, 42
 
+    @staticmethod
+    def get_average_cpu():
+        try:
+            from gpiozero import LoadAverage
+            ave = int(LoadAverage(minutes=1).load_average * 100)
+            return ave
+        except:
+            pass
+        return 42
 
 if __name__ == "__main__":
     cpu = Stats.get_cpu()

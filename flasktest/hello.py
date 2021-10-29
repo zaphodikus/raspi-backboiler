@@ -21,8 +21,11 @@ def about():
 @app.route('/system')
 def system():
     cpu = Stats.get_cpu()
-    system = Stats.get_system()
+    hw_system = Stats.get_system()
     free, used = Stats.get_disk_space()
     memory = Stats.get_free_memory()
-    return render_template('system.html', cpu=cpu, system=system, free=free, used=used, memory=memory)
+    average = Stats.get_average_cpu()
+    return render_template('system.html',
+                           cpu=cpu, system=hw_system, free=free,
+                           used=used, memory=memory, average=average)
 
