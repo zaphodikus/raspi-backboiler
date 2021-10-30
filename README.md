@@ -1,5 +1,5 @@
 # raspi-backboiler
-back boiler monitoring app in python
+Back boiler monitoring app in python.
 
 This is a scratchpad, as with most projects, it will be messy. This repo serves as a way to move code between a Rasberry Pi 4 and my desktop to make editing and so on easier. Sensors include a set of MAX6675's and DS18B20's on SPI and 1WD.
 
@@ -13,6 +13,7 @@ Dependencies are on the adafruit boards libraries https://pypi.org/project/Adafr
 
 #H/W&S/W Components
 ```
+All this will run on a Raspbery Pi 4 (4BG):
 +--------------+  +--------------+  +--------------+     
 |              |  |              |  |              |     
 | Temperature  |  |  SQLLITE     |  |  Datalogger  |     
@@ -20,18 +21,28 @@ Dependencies are on the adafruit boards libraries https://pypi.org/project/Adafr
 |              |  |              |  |              |     
 +--------------+  +--------------+  +--------------+     
                                                          
-+--------------+  +--------------+                       
-|              |  |              |                       
-|  Pollution   |  |  Arduino     |                       
-|  Sensors     |  |   ADC        |                       
-|              |  | conversion   |                       
-+--------------+  +--------------+                       
++--------------+  +--------------+  +--------------+                     
+|              |  |              |  |              |                     
+|  Pollution   |  |  Arduino     |  |  Flask Web   |                     
+|  Sensors     |  |   ADC        |  |    Server    |                     
+|              |  | conversion   |  |              |                     
++--------------+  +--------------+  +--------------+                     
 ```
+![Back Boiler](doc/WSDAID_220x300.jpg)
+
+This will mostly be attached to the back-boiler and plumbing and other parts of a Warrior 13KW 
+stove. I have features the stove in a YT channel called `100 logfires` , which currently has 2 
+subscribers. That;s how many days of a year this system runs for, the rest of the time, it will 
+be pretty boring room-temperature-like stuff going on with the exception of the solar panels in 
+the summer.
+
 ##Sensors 1WD:
+For the range 10-125°C, all sensors are non intrusive.
 * 4* DS18B20 sensors (boiler hot side) 
 * 1* DS18B20 sensors (pump line)
 ##Sensors SPI:
-* 1* MAX6675 thermocouple (flue)
+For the range 100-600°C (expected max 400°C)
+* 1* MAX6675 thermocouple (flue temp)
 
 ##Planned sensors:
 Will connect to a second raspi in loft space 
@@ -44,8 +55,8 @@ Will connect to a second raspi in loft space
 Multiple data acquisition and data logging and rendering apps.
 todo: configuration notes
 
-* Acquisition app: Read DS81B20's and the MAX6675's and write into sqlilite write each to 1 row of database at 5 second intervals for live data values. 
-  Data will also get piped via a filter into a rotating data-logger table. 
+* Acquisition app: Read DS81B20's and the MAX6675's and write into sqllite db, write each to 1 row of database at 5 second intervals for live data values. 
+  Data will also get piped via a filter into a rotating data-logger table, and eventually into a cloud. 
 * Data-logger routine runs in the acquisition app, will run every 1 minute and filter and deadband the data to save space, into a second table.
   Deadband threshold and timer to ensure a value is written every hour, but no more than every minute. Logger will also use a second filter to write a row into a google docs sheet at least once per 24 hours. Each sensor will have it's own deadband configuration.
 * Flask Web server, very basic phase1. Read just the last valid values and display, allow changing of sensor names.
@@ -56,29 +67,34 @@ todo: configuration notes
 * Connect main Raspberry pi to public internet
 
 #Installation steps
- enable 1WD in sudo raspi-config
- enable spi driver in sudo raspi-config
+ - enable 1WD in sudo raspi-config
+ - enable spi driver in sudo raspi-config
+ - reboot Raspberry pi
 ```
  sudo apt-get install python3-pip
- sudo pip3 install --upgrade setuptools
- 
+ sudo pip3 install --upgrade setuptools 
  pip3 install adafruit_blinka
- :: Required to install since numpy wants some c library called 
- ::  libf77blas.so.3
+ pip install psutil
+ ```
+Data modules
+```
  sudo apt-get install libatlas-base-dev
+```
+ - Install ^^ first since numpy wants some c library called `libf77blas.so.3`
+``` 
  pip3 install pandas
  pip3 install matplotlib
  pip3 install seaborn
  pip install flask
- pip install psutil
 ```
 Flask app setup
 ```
 export FLASK_APP=test.py
-export FLASK_ENV=development
-
 ```
+
 ## Google docs Integration
 (todo)
 * setup auth token https://developers.google.com/sheets/api/quickstart/python
 * pip install --upgrade google-api-python-client google-auth-httplib2 google-auth-oauthlib
+* todo: link to solar panel protocol
+* todo link to the old 100 logfires YT channel

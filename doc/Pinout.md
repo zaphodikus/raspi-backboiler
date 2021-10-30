@@ -58,25 +58,15 @@ DS81B20(1WD) and MAX6675(SPI)
  - 1WD goes to the DS81B20 one-wire pin on the sensor
  - MOSI,MOSO,CLK are the SPI channel and use GPIO4 as _CHIP-SELECT line
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+A few issues for now are that I'm running the May2021 32-bit Rasp OS and really want to update to the 
+64bit, so that's a rebuild. Also I intend to rebuild into a SSD, so will have some notes on the 
+SSD booting setup work, (when I do that bit) which involves some extra steps you would not have 
+suspected.
 
 
 
 # References 
-(move these to a new doc later)
+(todo: move these to a new doc later)
  - https://github.com/tvierb/raspberry-ascii
  - https://www.raspberrypi-spy.co.uk/2018/02/enable-1-wire-interface-raspberry-pi/#:~:text=The%20Raspberry%20Pi%20has%20a,as%20the%20DS18B20%20temperature%20sensor.
- - 
+ - https://developers.google.com/sheets/api/quickstart/python
