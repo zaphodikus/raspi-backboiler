@@ -37,7 +37,10 @@ class Stats(object):
     @staticmethod
     def get_free_memory():
         if psutil_exist:
-            memory = psutil.virtual_memory()
+            # returns svmem(total=4025200640, available=3495411712, percent=13.2, used=321916928,
+            # free=3128578048, active=221728768, inactive=544161792, buffers=36425728, cached=538279936,
+            # shared=73854976, slab=45441024)
+            memory = psutil.virtual_memory().available
             return memory
         return 42
 
