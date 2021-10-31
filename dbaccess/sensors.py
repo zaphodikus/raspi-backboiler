@@ -1,6 +1,6 @@
 import sqlite3 as sql
 import datetime, time
-
+import os
 
 class DbBaseObject(object):
     """
@@ -64,9 +64,10 @@ class DbSensorDatabase(object):
     db_timeformat = "%Y-%m-%d %H:%M:%S"  # hard coded system time formatter
     db_sensor_stale_time = 10            # seconds before we decide data has not arrived
 
-    def __init__(self, ):
-        conn = sql.connect('../db/dbaccess')
+    def __init__(self, db_root_path='../db'):
         print(f"SQLite version {sql.sqlite_version}")
+        print(f"Opening {os.path.join(db_root_path, 'dbaccess')}")
+        conn = sql.connect(os.path.join(db_root_path, 'dbaccess'))
 
         cursorObj = conn.cursor()
         cursorObj.execute('drop table if exists sensors')

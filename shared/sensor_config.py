@@ -1,2 +1,4 @@
 # 1wD sensor addresses
-sensor_names = {}
+class SystemConfig(object):
+
+    ramdisk_path = '/mnt/ramdisk'

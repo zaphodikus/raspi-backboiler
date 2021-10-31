@@ -14,6 +14,7 @@ from shared.DS18B20.ds18b20 import DS18B20, TempSensor
 from shared.MAX6675.MAX6675 import MAX6675
 from sensors import DbDS18B20Sensor, DbMAX6675Sensor, DbSensorDatabase
 from threading import Thread
+from flasktest.raspberry.raspberry import is_raspberrypi
 
 # https://stackoverflow.com/questions/6893968/how-to-get-the-return-value-from-a-thread-in-python
 #def foo(bar):
@@ -39,7 +40,10 @@ class ThreadWithReturnValue(Thread):
     
 
 if __name__ == "__main__":
-    db = DbSensorDatabase()
+    if is_raspberrypi():
+        db = DbSensorDatabase(db_root_path='/mnt/ramdisk')
+    else:
+        db = DbSensorDatabase()
     address_DS18B20 = DS18B20.get_sensor_addresses()
     hw_sensors = []
     db_sensors = {}

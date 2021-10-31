@@ -67,8 +67,10 @@ todo: configuration notes
 * Connect main Raspberry pi to public internet
 
 #Installation steps
+(todo : Script these machine setup steps)
  - enable 1WD in sudo raspi-config
  - enable spi driver in sudo raspi-config
+ - enable autologon on start 
  - reboot Raspberry pi
 ```
  sudo apt-get install python3-pip
@@ -98,3 +100,10 @@ export FLASK_APP=test.py
 * pip install --upgrade google-api-python-client google-auth-httplib2 google-auth-oauthlib
 * todo: link to solar panel protocol
 * todo link to the old 100 logfires YT channel
+
+## System Startup
+todo : Ramdisk for sqllite temporary databases
+
+todo : start IO server on startup and use the ramdisc for high speed logs
+
+todo : start the web server on startup
