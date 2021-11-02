@@ -4,8 +4,15 @@ from flask import Flask, render_template, request, redirect, url_for
 from pathlib import Path
 sys.path.append(str(Path(os.getcwd()).parent))
 from .raspberry.raspberry import is_raspberrypi, Stats
+from dbaccess.sensors import DbSensorDatabase, DbSensor
+from shared.sensor_config import SystemConfig
+
 
 app = Flask(__name__)
+if is_raspberrypi():
+    db = DbSensorDatabase(db_root_path=SystemConfig.ramdisk_path)
+else:
+    db = DbSensorDatabase()
 
 
 @app.route('/')
@@ -16,6 +23,13 @@ def home():
 @app.route('/about')
 def about():
     return render_template('about.html')
+
+
+@app.route('/sensors')
+def about():
+    temp_table = ""
+    for sensor in
+    return render_template('sensors.html', temperatures=temp_table)
 
 
 @app.route('/system')
