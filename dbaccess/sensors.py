@@ -64,13 +64,14 @@ class DbSensorDatabase(object):
     db_timeformat = "%Y-%m-%d %H:%M:%S"  # hard coded system time formatter
     db_sensor_stale_time = 10            # seconds before we decide data has not arrived
 
-    def __init__(self, db_root_path='../db'):
+    def __init__(self, db_root_path='../db', drop=True):
         print(f"SQLite version {sql.sqlite_version}")
         print(f"Opening {os.path.join(db_root_path, 'dbaccess')}")
         conn = sql.connect(os.path.join(db_root_path, 'dbaccess'))
 
         cursorObj = conn.cursor()
-        cursorObj.execute('drop table if exists sensors')
+        if drop:
+            cursorObj.execute('drop table if exists sensors')
         self.con = conn
 
     def get_connection(self):

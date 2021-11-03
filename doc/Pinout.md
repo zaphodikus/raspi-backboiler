@@ -18,7 +18,7 @@ version from https://github.com/tvierb/raspberry-ascii
     (GPIO_GEN3) GPIO22----15-|O O|-16-----GPIO23 (GPIO_GEN4)
                     +3V3--17-|O O|-18-----GPIO24 (GPIO_GEN5)
      (SPI_MOSI) GPIO10----19-|O.O|-20---GND
-     (SPI_MOSO) GPIO9 ----21-|O O|-22-----GPIO25 (GPIO_GEN6)
+     (SPI_MISO) GPIO9 ----21-|O O|-22-----GPIO25 (GPIO_GEN6)
      (SPI_SCLK) GPIO11----23-|O O|-24-----GPIO8  (SPI_C0_N)
                      GND--25-|O O|-26-----GPIO7  (SPI_C1_N)
        (EEPROM) ID_SD-----27-|O O|-28-----ID_SC Reserved for ID EEPROM
@@ -31,22 +31,51 @@ version from https://github.com/tvierb/raspberry-ascii
                              '---'
 
 ## Sensors
-DS81B20(1WD) and MAX6675(SPI)
+**DS81B20 (1WD)** 
 
 
-                 -- 1-|O O|- 2--
-                 -- 3-|O O|- 4--
-                 -- 5-|O O|- 6--
-             1WD -- 7-|O O|- 8--
-             Gnd -- 9-|O.O|-10--
-                 --11-|O O|-12--
+                      .___.              
+                 -- 1-|O O|- 2--                Terminal block
+                 -- 3-|O O|- 4--                  +------+
+                 -- 5-|O O|- 6--        (black) - |Gnd   |
+             1WD -- 7-|O O|- 8--        (yellow)- |sense |
+             Gnd -- 9-|O.O|-10--        (red)   - |3V3   |
+                 --11-|O O|-12--                  +------+
                  --13-|O O|-14--
                  --15-|O O|-16--
              3v3 --17-|O O|-18--
                  --19-|O.O|-20--
-            MOSI --21-|O O|-22--
-            MOSO --23-|O O|-24--
-             CLK --25-|O O|-26--
+                 --21-|O O|-22--
+                 --23-|O O|-24--
+                 --25-|O O|-26--
+                 --27-|O O|-28--
+                 --29-|O.O|-30--
+                 --31-|O O|-32--
+                 --33-|O O|-34--
+                 --35-|O O|-36--
+                 --37-|O O|-38--
+                 --39-|O O|-40--
+                      '---'
+
+ - 1WD need 4K7 Ohm pull-up - connect to the DS81B20 one-wire pin on the sensor.
+
+**MAX6675(SPI)**   
+
+
+                      .___.              
+                 -- 1-|O O|- 2--                   Headder
+                 -- 3-|O O|- 4--                  +------+
+                 -- 5-|O O|- 6--        (black) - |Gnd O |
+                 -- 7-|O O|- 8--        (red)   - |3v3 O |
+             Gnd -- 9-|O.O|-10--        (   )   - |SCK O |
+                 --11-|O O|-12--        (   )   - | CS O |
+                 --13-|O O|-14--        (   )   - | DO O |
+                 --15-|O O|-16--                  +------+
+             3v3 --17-|O O|-18--
+                 --19-|O.O|-20--
+            MISO --21-|O O|-22--
+             SCK --23-|O O|-24--
+                 --25-|O O|-26--
                  --27-|O O|-28--
              _CS --29-|O.O|-30--
                  --31-|O O|-32--
@@ -54,9 +83,37 @@ DS81B20(1WD) and MAX6675(SPI)
                  --35-|O O|-36--
                  --37-|O O|-38--
                  --39-|O O|-40--
+                      '---'
 
- - 1WD goes to the DS81B20 one-wire pin on the sensor
- - MOSI,MOSO,CLK are the SPI channel and use GPIO4 as _CHIP-SELECT line
+
+ - MISO,SCK are the SPI channel and use GPIO5 as _CHIP-SELECT line
+
+**ASD1115 (I2c)**
+
+                             .___.              
+                    +3V3-- 1-|O O|- 2--+5V                         + Header+
+          (SDA)  GPIO2---- 3-|O O|- 4--+5V                    3V3  |   ( ) |
+         (SCL1)  GPIO3---- 5-|O O|- 6---GND                   Gnd  |   ( ) |
+                      ---- 7-|O O|- 8-----                    SCL  |   ( ) |
+                     GND-- 9-|O.O|-10-----                    SDA  |   ( ) |
+                      ----11-|O O|-12-----                    ADDR | (Gnd) |
+                      ----13-|O O|-14---GND                   ALRT | (N/C) | 
+                      ----15-|O O|-16-----                    A0   |   ( ) |
+                    +3V3--17-|O O|-18-----                    A1   |   ( ) |
+                      ----19-|O.O|-20---GND                   A2   |   ( ) |
+                      ----21-|O O|-22-----                    A3   |   ( ) |
+                      ----23-|O O|-24-----                         +-------+
+                     GND--25-|O O|-26-----       
+                      ----27-|O O|-28-----       
+                      ----29-|O.O|-30---GND
+                      ----31-|O O|-32----- 
+                      ----33-|O O|-34---GND
+                      ----35-|O O|-36----- 
+                      ----37-|O O|-38----- 
+                     GND--39-|O O|-40----- 
+                             '---'
+
+
 
 A few issues for now are that I'm running the May2021 32-bit Rasp OS and really want to update to the 
 64bit, so that's a rebuild. Also I intend to rebuild into a SSD, so will have some notes on the 
