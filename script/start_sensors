@@ -1,0 +1,5 @@
+#!/bin/bash
+cd /home/pi/src/python
+git pull
+cd dbaccess
+sudo python3 test.py

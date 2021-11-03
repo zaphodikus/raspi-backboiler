@@ -76,7 +76,8 @@ todo: configuration notes
  sudo apt-get install python3-pip
  sudo pip3 install --upgrade setuptools 
  pip3 install adafruit_blinka
- pip install psutil
+ pip3 install psutil
+ sudo pip3 install adafruit-circuitpython-bme280
  ```
 Data modules
 ```

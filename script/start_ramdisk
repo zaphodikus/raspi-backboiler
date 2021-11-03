@@ -1,0 +1,4 @@
+#!bin/bash
+sudo mkdir -p /mnt/ramdisk
+sudo mount -t tmpfs - size=100m tempfs /mnt/ramdisk
+

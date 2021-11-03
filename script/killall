@@ -1,0 +1,2 @@
+echo "killing " + $(ps aux | grep '[p]ython' | awk '{print $2}')
+sudo kill $(ps aux | grep '[p]ython' | awk '{print $2}')
