@@ -4,8 +4,7 @@ import glob
 import time
 import re
 
-
-class TempSensor(object):
+class RawSensor(object):
     def __init__(self, address):
         self.address = address
 
@@ -16,8 +15,17 @@ class TempSensor(object):
         raise Exception("NotImplementedError")
 
     @staticmethod
-    def get_sensor_units(self):
-        return r"C"
+    def get_sensor_units():
+        raise Exception("NotImplementedError")
+
+
+class TempSensor(RawSensor):
+    def __init__(self, address):
+        super().__init__(address)
+
+    @staticmethod
+    def get_sensor_units():
+        return r"°C"
 
 
 class DS18B20(TempSensor):

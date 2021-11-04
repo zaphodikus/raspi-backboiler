@@ -50,6 +50,7 @@ class MAX6675(TempSensor):
     def get_sensor_value(self):
         self.cs.value = False
         self.spi.readinto(self.raw, end=2)
+                
         self.cs.value = True
         if self.raw is None or len(self.raw) != 2:
             raise RuntimeError('Did not read expected number of bytes from device!')

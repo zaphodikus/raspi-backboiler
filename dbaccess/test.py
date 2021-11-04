@@ -54,6 +54,7 @@ class BMP280(TempSensor):
         print('Temperature: {} degrees C'.format(self.sensor.temperature))
 
     def get_sensor_value(self):
+        # TODO: may want to lock the bus to prevent thread calling us asyncronously
         return self.sensor.temperature
 
 
@@ -68,9 +69,8 @@ class BMP280H(TempSensor):
         return self.sensor.humidity
 
     @staticmethod
-    def get_sensor_units(self):
+    def get_sensor_units():
         return r"%"
-
 
 class BMP280P(TempSensor):
     def __init__(self, spi, cs_pin=board.D6):
@@ -82,11 +82,11 @@ class BMP280P(TempSensor):
     def get_sensor_value(self):
         return self.sensor.pressure
 
+
     @staticmethod
-    def get_sensor_units(self):
+    def get_sensor_units():
         return r"hPa"
-
-
+    
 if __name__ == "__main__":
     if is_raspberrypi():
         # use the "live" DB on a ramdisk to save SD card
@@ -122,22 +122,19 @@ if __name__ == "__main__":
     print(f"BMP280(T) address : {spi_addr}")
     hw_sensors.append(temp_sensor)
     db_sensors[spi_addr] = DbBMP280TemperatureSensor(db.get_connection(), spi_addr)
-
     pressure_sensor = BMP280P(spi_bus)  # default CS GPIO 6
     spi_addr = pressure_sensor.get_address()
     print(f"BMP280(P) address : {spi_addr}")
     hw_sensors.append(pressure_sensor)
-    db_sensors[spi_addr] = DbBMP280PressureSensor(db.get_connection(), spi_addr)
-
+    db_sensors[spi_addr] = DbBMP280HumiditySensor(db.get_connection(), spi_addr)
     humidity_sensor = BMP280H(spi_bus)  # default CS GPIO 6
     spi_addr = humidity_sensor.get_address()
     print(f"BMP280(P) address : {spi_addr}")
     hw_sensors.append(humidity_sensor)
-    db_sensors[spi_addr] = DbBMP280HumiditySensor(db.get_connection(), spi_addr)
-
-    print(hw_sensors)
+    db_sensors[spi_addr] = DbBMP280PressureSensor(db.get_connection(), spi_addr)
 
     while True:
+        print(datetime.datetime.now().strftime("%H:%M:%S"))
         th = []
         for s in hw_sensors:
             th.append(ThreadWithReturnValue(target=s.get_sensor_value))
@@ -145,9 +142,9 @@ if __name__ == "__main__":
         for i in range(0, len(hw_sensors)):
             #
             start = time.time()
-            temp = th[i].wait_result()
+            value = th[i].wait_result()
             end = time.time()
-            print(f"Async read temp {hw_sensors[i].get_address():12}={temp}°C")
+            print(f"Async read {hw_sensors[i].get_address():12} = {value}{hw_sensors[i].get_sensor_units()}")
             # write live value to database
-            db_sensors[hw_sensors[i].get_address()].set(temp)
-        time.sleep(1)
+            db_sensors[hw_sensors[i].get_address()].set(value)
+        time.sleep(5)
