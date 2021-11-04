@@ -3,7 +3,7 @@
 ### Art
 It's a bit more work than one might like to get any DIY project documented properly. 
 At least to the level where the maker could come back 20 years on and reproduce the 
-same working artefact from said documentation, but it's also fun to try do so in a 
+same working artefact from said documentation, but it's also fun to try and do so in a 
 more editable fashion, so we will give ascii art a go. The template I use is a modified 
 version from https://github.com/tvierb/raspberry-ascii
 
@@ -31,7 +31,7 @@ version from https://github.com/tvierb/raspberry-ascii
                              '---'
 
 ## Sensors
-**DS81B20 (1WD)** 
+**DS81B20 (1WD) Temp sensors** 
 
 
                       .___.              
@@ -59,11 +59,11 @@ version from https://github.com/tvierb/raspberry-ascii
 
  - 1WD need 4K7 Ohm pull-up - connect to the DS81B20 one-wire pin on the sensor.
 
-**MAX6675(SPI)**   
+**MAX6675(SPI) Thermocouple**   
 
 
                       .___.              
-                 -- 1-|O O|- 2--                   Headder
+                 -- 1-|O O|- 2--                   Header
                  -- 3-|O O|- 4--                  +------+
                  -- 5-|O O|- 6--        (black) - |Gnd O |
                  -- 7-|O O|- 8--        (red)   - |3v3 O |
@@ -77,7 +77,7 @@ version from https://github.com/tvierb/raspberry-ascii
              SCK --23-|O O|-24--
                  --25-|O O|-26--
                  --27-|O O|-28--
-             _CS --29-|O.O|-30--
+    (GPIO5)  _CS --29-|O.O|-30--
                  --31-|O O|-32--
                  --33-|O O|-34--
                  --35-|O O|-36--
@@ -86,23 +86,52 @@ version from https://github.com/tvierb/raspberry-ascii
                       '---'
 
 
- - MISO,SCK are the SPI channel and use GPIO5 as _CHIP-SELECT line
+ - MISO,SCK are the SPI channel and use GPIO5 as _CHIP-SELECT line.
+
+**BME280(SPI) Pressure sensor BMP280**   
+
+
+                      .___.              
+                 -- 1-|O O|- 2--                   Header
+                 -- 3-|O O|- 4--                  +-------+
+                 -- 5-|O O|- 6--        (blk  ) - |3v3  O |
+                 -- 7-|O O|- 8--        (wht)   - |Gnd  O |
+             Gnd -- 9-|O.O|-10--        (gry)   - |SCK  O |
+                 --11-|O O|-12--        (bio)   - |MOSI O |
+                 --13-|O O|-14--        (blu)   - |_CS  O |
+                 --15-|O O|-16--        (grn)   - |MISO O |                  
+             3v3 --17-|O O|-18--                  +-------+
+            MOSI --19-|O.O|-20--
+            MISO --21-|O O|-22--
+             SCK --23-|O O|-24--
+                 --25-|O O|-26--
+                 --27-|O O|-28--
+                 --29-|O.O|-30--
+     (GPIO6) _CS --31-|O O|-32--
+                 --33-|O O|-34--
+                 --35-|O O|-36--
+                 --37-|O O|-38--
+                 --39-|O O|-40--
+                      '---'
+
+
+ - MOSI, MISO, SCK are the SPI channel and use GPIO6 as _CHIP-SELECT line.
 
 **ASD1115 (I2c)**
 
                              .___.              
-                    +3V3-- 1-|O O|- 2--+5V                         + Header+
-          (SDA)  GPIO2---- 3-|O O|- 4--+5V                    3V3  |   ( ) |
-         (SCL1)  GPIO3---- 5-|O O|- 6---GND                   Gnd  |   ( ) |
-                      ---- 7-|O O|- 8-----                    SCL  |   ( ) |
-                     GND-- 9-|O.O|-10-----                    SDA  |   ( ) |
-                      ----11-|O O|-12-----                    ADDR | (Gnd) |
-                      ----13-|O O|-14---GND                   ALRT | (N/C) | 
-                      ----15-|O O|-16-----                    A0   |   ( ) |
-                    +3V3--17-|O O|-18-----                    A1   |   ( ) |
-                      ----19-|O.O|-20---GND                   A2   |   ( ) |
-                      ----21-|O O|-22-----                    A3   |   ( ) |
-                      ----23-|O O|-24-----                         +-------+
+                    +3V3-- 1-|O O|- 2--+5V                 + Header+
+          (SDA)  GPIO2---- 3-|O O|- 4--+5V            3V3  |   ( ) |
+         (SCL1)  GPIO3---- 5-|O O|- 6---GND           Gnd  |   ( ) |
+                      ---- 7-|O O|- 8-----            SCL  |   ( ) |
+                     GND-- 9-|O.O|-10-----            SDA  |   ( ) |
+                      ----11-|O O|-12-----            ADDR | (Gnd) |
+                      ----13-|O O|-14---GND           ALRT | (N/C) | 
+                      ----15-|O O|-16-----            A0   |   ( ) | MQ-5
+                    +3V3--17-|O O|-18-----            A1   |   ( ) | 
+                      ----19-|O.O|-20---GND           A2   |   ( ) |
+                      ----21-|O O|-22-----            A3   |   ( ) |
+                      ----23-|O O|-24-----                 +-------+
                      GND--25-|O O|-26-----       
                       ----27-|O O|-28-----       
                       ----29-|O.O|-30---GND

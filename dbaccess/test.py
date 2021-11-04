@@ -16,6 +16,10 @@ from sensors import DbDS18B20Sensor, DbMAX6675Sensor, DbSensorDatabase
 from threading import Thread
 from flasktest.raspberry.raspberry import is_raspberrypi
 from shared.sensor_config import SystemConfig
+if is_raspberrypi():
+    import board
+    import busio
+
 
 class ThreadWithReturnValue(Thread):
     # https://stackoverflow.com/questions/6893968/how-to-get-the-return-value-from-a-thread-in-python
@@ -32,10 +36,31 @@ class ThreadWithReturnValue(Thread):
     def wait_result(self, *args):
         Thread.join(self, *args)
         return self._return
-    
+
+
+# temporary
+from shared.DS18B20.ds18b20 import TempSensor
+if is_raspberrypi():
+    import digitalio
+    from adafruit_bme280 import basic as adafruit_bme280
+
+
+class BMP280(TempSensor):
+    def __init__(self, spi, cs_pin=board.D6):
+        super().__init__(f"spi_CSPIN_{cs_pin}")  # use the CS pin as an SPI 'address'
+        self.sensor = adafruit_bme280.Adafruit_BME280_SPI(spi, cs_pin)
+
+        print('Temperature: {} degrees C'.format(self.sensor.temperature))
+        print('Pressure: {}hPa'.format(self.sensor.pressure))
+        print('Humidity: {}%'.format(self.sensor.humidity))
+
+    def get_sensor_temp(self):
+        return self.sensor.temperature
+
 
 if __name__ == "__main__":
     if is_raspberrypi():
+        # use the "live" DB on a ramdisk to save SD card
         db = DbSensorDatabase(db_root_path=SystemConfig.ramdisk_path)
     else:
         db = DbSensorDatabase()
@@ -43,16 +68,32 @@ if __name__ == "__main__":
     hw_sensors = []
     db_sensors = {}
 
+    # Start 1WD
     for k in address_DS18B20:
         print(f"Adding '{k}' AS '{address_DS18B20[k]}'")
         hw_sensors.append(DS18B20.new_sensor(k, address_DS18B20[k]))
         db_sensors[k] = DbDS18B20Sensor(db.get_connection(), k)
-    thermocouple = MAX6675()  # default CS pin
+    # start SPI
+    print(f"Starting SPI, lock bus...'")
+    spi_bus = busio.SPI(board.SCLK, board.MOSI, board.MISO)
+    while not spi_bus.try_lock():
+        pass
+    spi_bus.configure(baudrate=4000000)  # 4MHz, chip can do 5MHz normally
+    # Note: will run fine at 100KHz
+    spi_bus.unlock()
+
+    thermocouple = MAX6675(spi_bus)  # default CS GPIO 5
     spi_addr = thermocouple.get_address()
     print(f"MAX6675 address : {spi_addr}")
     hw_sensors.append(thermocouple)
     db_sensors[spi_addr] = DbMAX6675Sensor(db.get_connection(), spi_addr)
-    #print(hw_sensors)
+
+    pressure_sensor = BMP280(spi_bus) # default CS GPIO 6
+    spi_addr = pressure_sensor.get_address()
+    print(f"BMP280 address : {spi_addr}")
+    hw_sensors.append(pressure_sensor)
+    db_sensors[spi_addr] = DbMAX6675Sensor(db.get_connection(), spi_addr)
+    print(hw_sensors)
 
     while True:
         th = []

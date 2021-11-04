@@ -1,12 +1,13 @@
 import board
-import busio
+#import busio
 import digitalio
-import time
-import sys
+#import time
+#import sys
 from shared.DS18B20.ds18b20 import TempSensor
 
+
 class MAX6675(TempSensor):
-    def __init__(self, cs_pin=board.D5):
+    def __init__(self, spi, cs_pin=board.D5):
         """
 
         :param cs_pin: The pin to use for SPI chip select
@@ -16,12 +17,8 @@ class MAX6675(TempSensor):
         self._chip_select = cs_pin
         self.cs = digitalio.DigitalInOut(self._chip_select)  # normally GPIO 5
         self.cs.direction = digitalio.Direction.OUTPUT
-        self.spi = busio.SPI(board.SCLK, board.MOSI, board.MISO)
-        while not self.spi.try_lock():
-            pass
-        self.spi.configure(baudrate=4000000)  # 4MHz, chip can do 5MHz normally
-        # Note: will run fine at 100KHz
-        self.spi.unlock()
+        self.spi = spi
+
         self.raw = bytearray(2)
 
         # gobble the first conversion and any noise
