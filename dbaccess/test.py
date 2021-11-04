@@ -48,7 +48,7 @@ if is_raspberrypi():
 class BMP280(TempSensor):
     def __init__(self, spi, cs_pin=board.D6):
         super().__init__(f"spi_CSPIN_{cs_pin}")  # use the CS pin as an SPI 'address'
-        self.sensor = adafruit_bme280.Adafruit_BME280_SPI(spi, cs_pin)
+        self.sensor = adafruit_bme280.Adafruit_BME280_SPI(spi, digitalio.DigitalInOut(cs_pin))
 
         print('Temperature: {} degrees C'.format(self.sensor.temperature))
         print('Pressure: {}hPa'.format(self.sensor.pressure))
