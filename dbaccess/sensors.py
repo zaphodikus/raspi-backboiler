@@ -88,7 +88,7 @@ class DbSensor(DbBaseObject):
     DISPLAY_NAME = 'display_name'
     SENSOR_ADDRESS = 'address'
 
-    def __init__(self, connection, source:str, address: str, units):
+    def __init__(self, connection, source:str, address: str, units: str):
         fields = [
             f"{self.SENSOR_ADDRESS} text PRIMARY KEY",
             "source text",
@@ -97,14 +97,15 @@ class DbSensor(DbBaseObject):
             f"{self.LAST_LIVE} text",
             f"unit text"
         ]
+        print(f"      {units}")
         super().__init__(connection, 'sensors', fields)
         self.address = address
         try:
             self.get()
         except Exception as e:
-            self._create_row([f"{address}", f"{source}", f"unknown-{address}", 0.0, '', fr"{units}"])
+            self._create_row([f"{address}", f"{source}", f"unknown-{address}", 0.0, '', f"{units}"])
 
-    def _row_dict(self, row:[]):
+    def _row_dict(self, row: []):
         d = dict(zip(self._field_names(), row))
         return d
 

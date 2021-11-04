@@ -12,8 +12,12 @@ class TempSensor(object):
     def get_address(self):
         return self.address
 
-    def get_sensor_temp(self):
+    def get_sensor_value(self):
         raise Exception("NotImplementedError")
+
+    @staticmethod
+    def get_sensor_units(self):
+        return r"C"
 
 
 class DS18B20(TempSensor):
@@ -46,7 +50,7 @@ class DS18B20(TempSensor):
             lines = f.readlines()
             return lines
 
-    def get_sensor_temp(self):
+    def get_sensor_value(self):
         """
         Note: DS18B20 takes about 900 ms to read the file, so this has
         to be background tasked

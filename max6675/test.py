@@ -12,5 +12,5 @@ if __name__ == "__main__":
     sensors.append(thermocouple)
     while True:
         for s in sensors:
-            print(f" {s.get_address()}={s.get_sensor_temp()}°C")
+            print(f" {s.get_address()}={s.get_sensor_value()}°C")
         time.sleep(1)

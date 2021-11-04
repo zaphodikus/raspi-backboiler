@@ -47,7 +47,7 @@ class MAX6675(TempSensor):
             # Scale by 0.25 degrees C per bit and return value.
         return raw_val * 0.25
 
-    def get_sensor_temp(self):
+    def get_sensor_value(self):
         self.cs.value = False
         self.spi.readinto(self.raw, end=2)
         self.cs.value = True

@@ -53,7 +53,7 @@ class BMP280(TempSensor):
 
         print('Temperature: {} degrees C'.format(self.sensor.temperature))
 
-    def get_sensor_temp(self):
+    def get_sensor_value(self):
         return self.sensor.temperature
 
 
@@ -64,8 +64,12 @@ class BMP280H(TempSensor):
 
         print('Humidity: {}%'.format(self.sensor.humidity))
 
-    def get_sensor_temp(self):
+    def get_sensor_value(self):
         return self.sensor.humidity
+
+    @staticmethod
+    def get_sensor_units(self):
+        return r"%"
 
 
 class BMP280P(TempSensor):
@@ -75,8 +79,12 @@ class BMP280P(TempSensor):
 
         print('Pressure: {}hPa'.format(self.sensor.pressure))
 
-    def get_sensor_temp(self):
+    def get_sensor_value(self):
         return self.sensor.pressure
+
+    @staticmethod
+    def get_sensor_units(self):
+        return r"hPa"
 
 
 if __name__ == "__main__":
@@ -114,23 +122,25 @@ if __name__ == "__main__":
     print(f"BMP280(T) address : {spi_addr}")
     hw_sensors.append(temp_sensor)
     db_sensors[spi_addr] = DbBMP280TemperatureSensor(db.get_connection(), spi_addr)
+
     pressure_sensor = BMP280P(spi_bus)  # default CS GPIO 6
     spi_addr = pressure_sensor.get_address()
     print(f"BMP280(P) address : {spi_addr}")
     hw_sensors.append(pressure_sensor)
-    db_sensors[spi_addr] = DbBMP280HumiditySensor(db.get_connection(), spi_addr)
+    db_sensors[spi_addr] = DbBMP280PressureSensor(db.get_connection(), spi_addr)
+
     humidity_sensor = BMP280H(spi_bus)  # default CS GPIO 6
     spi_addr = humidity_sensor.get_address()
     print(f"BMP280(P) address : {spi_addr}")
     hw_sensors.append(humidity_sensor)
-    db_sensors[spi_addr] = DbBMP280PressureSensor(db.get_connection(), spi_addr)
+    db_sensors[spi_addr] = DbBMP280HumiditySensor(db.get_connection(), spi_addr)
 
     print(hw_sensors)
 
     while True:
         th = []
         for s in hw_sensors:
-            th.append(ThreadWithReturnValue(target=s.get_sensor_temp))
+            th.append(ThreadWithReturnValue(target=s.get_sensor_value))
             th[len(th)-1].start()
         for i in range(0, len(hw_sensors)):
             #
