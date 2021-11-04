@@ -13,7 +13,7 @@ cs.direction = digitalio.Direction.OUTPUT
 spi = busio.SPI(board.SCLK, board.MOSI, board.MISO)
 while not spi.try_lock():
     pass
-spi.configure(baudrate=4000000)
+spi.configure(baudrate=5000000)
 # will run fine at 100KHz
 #spi.configure(baudrate=100000)
 spi.unlock()
@@ -52,7 +52,7 @@ while True:
     if raw is None or len(raw) != 2:
         raise RuntimeError('Did not read expected number of bytes from device!')
     value = raw[0] << 8 | raw[1]
-    #print('Raw value: 0x{0:08X}'.format(value & 0xFFFFFFFF))
+    print('Raw value: 0x{0:08X}'.format(value & 0xFFFFFFFF))
     # convert to a temperature
     temp = convert(value)
     print(f"Thermocouple: {temp}°C")
