@@ -47,15 +47,35 @@ if is_raspberrypi():
 
 class BMP280(TempSensor):
     def __init__(self, spi, cs_pin=board.D6):
-        super().__init__(f"spi_CSPIN_{cs_pin}")  # use the CS pin as an SPI 'address'
+        super().__init__(f"spi_CSPIN_{cs_pin}T")  # use the CS pin as an SPI 'address'
         self.sensor = adafruit_bme280.Adafruit_BME280_SPI(spi, digitalio.DigitalInOut(cs_pin))
 
         print('Temperature: {} degrees C'.format(self.sensor.temperature))
-        print('Pressure: {}hPa'.format(self.sensor.pressure))
-        print('Humidity: {}%'.format(self.sensor.humidity))
 
     def get_sensor_temp(self):
         return self.sensor.temperature
+
+
+class BMP280H(TempSensor):
+    def __init__(self, spi, cs_pin=board.D6):
+        super().__init__(f"spi_CSPIN_{cs_pin}H")  # use the CS pin as an SPI 'address'
+        self.sensor = adafruit_bme280.Adafruit_BME280_SPI(spi, digitalio.DigitalInOut(cs_pin))
+
+        print('Humidity: {}%'.format(self.sensor.humidity))
+
+    def get_sensor_temp(self):
+        return self.sensor.humidity
+
+
+class BMP280P(TempSensor):
+    def __init__(self, spi, cs_pin=board.D6):
+        super().__init__(f"spi_CSPIN_{cs_pin}P")  # use the CS pin as an SPI 'address'
+        self.sensor = adafruit_bme280.Adafruit_BME280_SPI(spi, digitalio.DigitalInOut(cs_pin))
+
+        print('Pressure: {}hPa'.format(self.sensor.pressure))
+
+    def get_sensor_temp(self):
+        return self.sensor.pressure
 
 
 if __name__ == "__main__":
@@ -88,11 +108,22 @@ if __name__ == "__main__":
     hw_sensors.append(thermocouple)
     db_sensors[spi_addr] = DbMAX6675Sensor(db.get_connection(), spi_addr)
 
-    pressure_sensor = BMP280(spi_bus) # default CS GPIO 6
+    temp_sensor = BMP280(spi_bus)  # default CS GPIO 6
+    spi_addr = temp_sensor.get_address()
+    print(f"BMP280(T) address : {spi_addr}")
+    hw_sensors.append(temp_sensor)
+    db_sensors[spi_addr] = DbMAX6675Sensor(db.get_connection(), spi_addr)
+    pressure_sensor = BMP280P(spi_bus)  # default CS GPIO 6
     spi_addr = pressure_sensor.get_address()
-    print(f"BMP280 address : {spi_addr}")
+    print(f"BMP280(P) address : {spi_addr}")
     hw_sensors.append(pressure_sensor)
     db_sensors[spi_addr] = DbMAX6675Sensor(db.get_connection(), spi_addr)
+    humidity_sensor = BMP280H(spi_bus)  # default CS GPIO 6
+    spi_addr = humidity_sensor.get_address()
+    print(f"BMP280(P) address : {spi_addr}")
+    hw_sensors.append(humidity_sensor)
+    db_sensors[spi_addr] = DbMAX6675Sensor(db.get_connection(), spi_addr)
+
     print(hw_sensors)
 
     while True:
