@@ -87,7 +87,8 @@ class DbSensor(DbBaseObject):
     LAST_LIVE = 'last_live'
     DISPLAY_NAME = 'display_name'
     SENSOR_ADDRESS = 'address'
-    def __init__(self, connection, source:str, address: str):
+
+    def __init__(self, connection, source:str, address: str, units):
         fields = [
             f"{self.SENSOR_ADDRESS} text PRIMARY KEY",
             "source text",
@@ -101,7 +102,7 @@ class DbSensor(DbBaseObject):
         try:
             self.get()
         except Exception as e:
-            self._create_row([f"{address}", f"{source}", f"unknown-{address}", 0.0, '', r"°C"])
+            self._create_row([f"{address}", f"{source}", f"unknown-{address}", 0.0, '', fr"{units}"])
 
     def _row_dict(self, row:[]):
         d = dict(zip(self._field_names(), row))
@@ -131,12 +132,27 @@ class DbSensor(DbBaseObject):
 
 class DbDS18B20Sensor(DbSensor):
     def __init__(self, connection, address):
-        super().__init__(connection, 'DS18B20', address)
+        super().__init__(connection, 'DS18B20', address, units="°C")
 
 
 class DbMAX6675Sensor(DbSensor):
     def __init__(self, connection, address):
-        super().__init__(connection, 'MAX6675', address)
+        super().__init__(connection, 'MAX6675', address, units="°C")
+
+
+class DbBMP280TemperatureSensor(DbSensor):
+    def __init__(self, connection, address):
+        super().__init__(connection, 'BMP280(T)', address, units="°C")
+
+
+class DbBMP280HumiditySensor(DbSensor):
+    def __init__(self, connection, address):
+        super().__init__(connection, 'BMP280(H)', address, units="%")
+
+
+class DbBMP280PressureSensor(DbSensor):
+    def __init__(self, connection, address):
+        super().__init__(connection, 'BMP280(P)', address, units="hPa")
 
 
 if __name__ == "__main__":

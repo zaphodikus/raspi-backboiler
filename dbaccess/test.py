@@ -12,7 +12,8 @@ from pathlib import Path
 sys.path.append(str(Path(os.getcwd()).parent))
 from shared.DS18B20.ds18b20 import DS18B20, TempSensor
 from shared.MAX6675.MAX6675 import MAX6675
-from sensors import DbDS18B20Sensor, DbMAX6675Sensor, DbSensorDatabase
+from sensors import DbDS18B20Sensor, DbMAX6675Sensor, DbSensorDatabase, \
+    DbBMP280TemperatureSensor, DbBMP280HumiditySensor, DbBMP280PressureSensor
 from threading import Thread
 from flasktest.raspberry.raspberry import is_raspberrypi
 from shared.sensor_config import SystemConfig
@@ -112,17 +113,17 @@ if __name__ == "__main__":
     spi_addr = temp_sensor.get_address()
     print(f"BMP280(T) address : {spi_addr}")
     hw_sensors.append(temp_sensor)
-    db_sensors[spi_addr] = DbMAX6675Sensor(db.get_connection(), spi_addr)
+    db_sensors[spi_addr] = DbBMP280TemperatureSensor(db.get_connection(), spi_addr)
     pressure_sensor = BMP280P(spi_bus)  # default CS GPIO 6
     spi_addr = pressure_sensor.get_address()
     print(f"BMP280(P) address : {spi_addr}")
     hw_sensors.append(pressure_sensor)
-    db_sensors[spi_addr] = DbMAX6675Sensor(db.get_connection(), spi_addr)
+    db_sensors[spi_addr] = DbBMP280HumiditySensor(db.get_connection(), spi_addr)
     humidity_sensor = BMP280H(spi_bus)  # default CS GPIO 6
     spi_addr = humidity_sensor.get_address()
     print(f"BMP280(P) address : {spi_addr}")
     hw_sensors.append(humidity_sensor)
-    db_sensors[spi_addr] = DbMAX6675Sensor(db.get_connection(), spi_addr)
+    db_sensors[spi_addr] = DbBMP280PressureSensor(db.get_connection(), spi_addr)
 
     print(hw_sensors)
 
