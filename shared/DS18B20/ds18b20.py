@@ -4,6 +4,7 @@ import glob
 import time
 import re
 
+
 class RawSensor(object):
     def __init__(self, address):
         self.address = address
@@ -19,7 +20,40 @@ class RawSensor(object):
         raise Exception("NotImplementedError")
 
 
-class TempSensor(RawSensor):
+class NoisySensor(object):
+    """
+    Helper which holds a last known good value which is substituted if a sensor read fails once
+    """
+    def __init__(self):
+        self._last_known_value = None
+
+    def __setattr__(self, key, value):
+        if key == 'last_known_value':
+            if NoisySensor._is_valid(value):
+                self._last_known_value = value
+            else:
+                print(f"Bad sensor value {value} for {self.get_address()}, ignored")
+        else:
+            super(NoisySensor, self).__setattr__(key, value)
+
+    def __getattr__(self, item):
+        if item == 'last_known_value':
+            if self._last_known_value is None:
+                print(f"Sensor {self.get_address()} is offline")
+            value = self._last_known_value
+            self._last_known_value = None
+            return value
+        else:
+            return super(NoisySensor, self).__getattr__(item)
+
+    @staticmethod
+    def _is_valid(value):
+        if value == 0 or value is None:
+            return False
+        return True
+
+
+class TempSensor(RawSensor, NoisySensor):
     def __init__(self, address):
         super().__init__(address)
 
@@ -34,7 +68,7 @@ class DS18B20(TempSensor):
         self.device_path = device_path
 
     @staticmethod
-    def get_sensor_addresses():
+    def get_DB18B20_addresses():
         """
         :return: a dict of sensors
         """
@@ -71,4 +105,5 @@ class DS18B20(TempSensor):
         if equals_pos != -1:
             temp_string = lines[1][equals_pos + 2:]
             temp_c = float(temp_string) / 1000.0
-            return temp_c
+            self.last_known_value = temp_c  # cache last known good values
+            return self.last_known_value
