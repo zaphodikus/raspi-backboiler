@@ -10,7 +10,9 @@ import os
 import sys
 from pathlib import Path
 sys.path.append(str(Path(os.getcwd()).parent))
-from shared.DS18B20.ds18b20 import DS18B20, TempSensor
+from shared.sensorbase.sensorbase import TempSensor
+
+from shared.DS18B20.ds18b20 import DS18B20
 from shared.MAX6675.MAX6675 import MAX6675
 from sensors import DbDS18B20Sensor, DbMAX6675Sensor, DbSensorDatabase, \
     DbBMP280TemperatureSensor, DbBMP280HumiditySensor, DbBMP280PressureSensor
@@ -43,7 +45,7 @@ class ThreadWithReturnValue(Thread):
 
 
 # temporary
-from shared.DS18B20.ds18b20 import TempSensor
+
 if is_raspberrypi():
     import digitalio
     from adafruit_bme280 import basic as adafruit_bme280
@@ -61,8 +63,8 @@ class BMP280(TempSensor):
         # TODO: may want to lock the bus to prevent thread calling us asyncronously
         while not self.spi.trylock():
            pass
-        t= self.sensor.temperature
-        sle.spi.unlock()
+        t = self.sensor.temperature
+        self.spi.unlock()
         return value 
 
 
@@ -85,6 +87,7 @@ class BMP280H(TempSensor):
     def get_sensor_units():
         return r"%"
 
+
 class BMP280P(TempSensor):
     def __init__(self, spi, cs_pin=board.D6):
         super().__init__(f"spi_CSPIN_{cs_pin}P")  # use the CS pin as an SPI 'address'
@@ -100,11 +103,11 @@ class BMP280P(TempSensor):
         self.spi.unlock()
         return p
 
-
     @staticmethod
     def get_sensor_units():
         return r"hPa"
-    
+
+
 if __name__ == "__main__":
     if is_raspberrypi():
         # use the "live" DB on a ramdisk to save SD card
@@ -152,7 +155,7 @@ if __name__ == "__main__":
     db_sensors[spi_addr] = DbBMP280PressureSensor(db.get_connection(), spi_addr)
 
     # CSV file
-    csv_path =  '../log/sensors.csv'
+    csv_path = '../log/sensors.csv'
     with open(csv_path, 'a') as csv_file:
         cols = ['time']
         for i in range(0, len(hw_sensors)):
@@ -164,7 +167,6 @@ if __name__ == "__main__":
         ts = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
         print(ts)
 
-            
         th = []
         for s in hw_sensors:
             th.append(ThreadWithReturnValue(target=s.get_sensor_value))
