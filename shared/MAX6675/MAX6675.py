@@ -13,6 +13,7 @@ class MAX6675(TempSensor):
         :param cs_pin: The pin to use for SPI chip select
         """
         super().__init__(f"spi_CSPIN_{cs_pin}")  # use the CS pin as an SPI 'address'
+        self.device_path = f"SPI_CS{cs_pin}" + self.get_address()
         print(f"  Creating MAX6675 {self.get_address()} on SPI")
         self._chip_select = cs_pin
         self.cs = digitalio.DigitalInOut(self._chip_select)  # normally GPIO 5
@@ -48,10 +49,13 @@ class MAX6675(TempSensor):
         return raw_val * 0.25
 
     def get_sensor_value(self):
+        while not self.spi.try_lock():
+            pass
         self.cs.value = False
         self.spi.readinto(self.raw, end=2)
-                
         self.cs.value = True
+        self.spi.unlock()
+        
         if self.raw is None or len(self.raw) != 2:
             raise RuntimeError('Did not read expected number of bytes from device!')
         value = self.raw[0] << 8 | self.raw[1]

@@ -44,7 +44,12 @@ class NoisySensor(object):
             self._last_known_value = None
             return value
         else:
-            return super(NoisySensor, self).__getattr__(item)
+            try:
+                return super(NoisySensor, self).__getattr__(item)
+            except Exception as e:
+                print(f"ERROR READING FROM {self.device_path} !!!")
+                #print(f"{e} while accessing property/method {item} of {self.__class__}")
+                raise e
 
     @staticmethod
     def _is_valid(value):
