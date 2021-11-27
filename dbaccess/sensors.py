@@ -2,6 +2,7 @@ import sqlite3 as sql
 import datetime, time
 import os
 
+
 class DbBaseObject(object):
     """
     Wrapper/helper object for a record

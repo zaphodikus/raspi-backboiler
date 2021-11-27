@@ -96,7 +96,7 @@ if __name__ == "__main__":
         db = DbSensorDatabase(db_root_path=SystemConfig.ramdisk_path)
     else:
         db = DbSensorDatabase()
-    address_DS18B20 = DS18B20.get_sensor_addresses()
+    address_DS18B20 = DS18B20.get_DB18B20_addresses()
     hw_sensors = []
     db_sensors = {}
 

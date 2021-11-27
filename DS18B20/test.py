@@ -7,7 +7,7 @@ sys.path.append(str(Path(os.getcwd()).parent))
 from shared.DS18B20.ds18b20 import DS18B20
 
 if __name__ == "__main__":
-    sensorlist = DS18B20.get_sensor_addresses()
+    sensorlist = DS18B20.get_DB18B20_addresses()
     sensors = []
     for k in sensorlist:
         print(f"adding {k} AS {sensorlist[k]}")
