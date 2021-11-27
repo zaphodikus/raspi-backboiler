@@ -52,24 +52,34 @@ if is_raspberrypi():
 class BMP280(TempSensor):
     def __init__(self, spi, cs_pin=board.D6):
         super().__init__(f"spi_CSPIN_{cs_pin}T")  # use the CS pin as an SPI 'address'
+        self.device_path = f"T {cs_pin}" + self.get_address()
         self.sensor = adafruit_bme280.Adafruit_BME280_SPI(spi, digitalio.DigitalInOut(cs_pin))
 
         print('Temperature: {} degrees C'.format(self.sensor.temperature))
 
     def get_sensor_value(self):
         # TODO: may want to lock the bus to prevent thread calling us asyncronously
-        return self.sensor.temperature
+        while not self.spi.trylock():
+           pass
+        t= self.sensor.temperature
+        sle.spi.unlock()
+        return value 
 
 
 class BMP280H(TempSensor):
     def __init__(self, spi, cs_pin=board.D6):
         super().__init__(f"spi_CSPIN_{cs_pin}H")  # use the CS pin as an SPI 'address'
+        self.device_path = f"H {cs_pin}" + self.get_address()
         self.sensor = adafruit_bme280.Adafruit_BME280_SPI(spi, digitalio.DigitalInOut(cs_pin))
 
         print('Humidity: {}%'.format(self.sensor.humidity))
 
     def get_sensor_value(self):
-        return self.sensor.humidity
+        while not self.spi.trylock():
+           pass
+        h = self.sensor.humidity
+        self.spi.unlock()
+        return h 
 
     @staticmethod
     def get_sensor_units():
@@ -78,12 +88,17 @@ class BMP280H(TempSensor):
 class BMP280P(TempSensor):
     def __init__(self, spi, cs_pin=board.D6):
         super().__init__(f"spi_CSPIN_{cs_pin}P")  # use the CS pin as an SPI 'address'
+        self.device_path = f"P {cs_pin}" + self.get_address()
         self.sensor = adafruit_bme280.Adafruit_BME280_SPI(spi, digitalio.DigitalInOut(cs_pin))
 
         print('Pressure: {}hPa'.format(self.sensor.pressure))
 
     def get_sensor_value(self):
-        return self.sensor.pressure
+        while not self.spi.trylock():
+           pass
+        p = self.sensor.pressure
+        self.spi.unlock()
+        return p
 
 
     @staticmethod
@@ -164,7 +179,7 @@ if __name__ == "__main__":
             db_sensors[hw_sensors[i].get_address()].set(value)
 
         # log to CSV
-        if csv_counter % 5 == 0:
+        if False: # not csv_counter % 5 :
             print(f"Append to {csv_path}")
             with open(csv_path, 'a') as csv_file:
                 cols = [ts]
@@ -173,4 +188,4 @@ if __name__ == "__main__":
                 csv_file.write(','.join(cols) + '\n')
         csv_counter +=1
         
-        time.sleep(5)
+        #time.sleep(5)
