@@ -10,12 +10,11 @@ import os
 import sys
 from pathlib import Path
 sys.path.append(str(Path(os.getcwd()).parent))
-from sensors import DbDS18B20Sensor, DbMAX6675Sensor, DbSensorDatabase, \
+from sensors import DbMAX6675Sensor, DbSensorDatabase, \
     DbBMP280TemperatureSensor, DbBMP280HumiditySensor, DbBMP280PressureSensor
 
 from shared.thread.sensorthread import ThreadWithReturnValue
 from shared.sensorbase.sensorbase import TempSensor
-from shared.DS18B20.ds18b20 import DS18B20
 from shared.MAX6675.MAX6675 import MAX6675
 from shared.sensor_config import SystemConfig
 # temporary
@@ -87,15 +86,9 @@ if __name__ == "__main__":
         db = DbSensorDatabase(db_root_path=SystemConfig.ramdisk_path)
     else:
         db = DbSensorDatabase()
-    address_DS18B20 = DS18B20.get_DB18B20_addresses()
     hw_sensors = []
     db_sensors = {}
 
-    # Start 1WD
-    for k in address_DS18B20:
-        print(f"Adding '{k}' AS '{address_DS18B20[k]}'")
-        hw_sensors.append(DS18B20.new_sensor(k, address_DS18B20[k]))
-        db_sensors[k] = DbDS18B20Sensor(db.get_connection(), k)
     # start SPI
     print(f"Starting SPI, lock bus...'")
     spi_bus = busio.SPI(board.SCLK, board.MOSI, board.MISO)
@@ -153,14 +146,4 @@ if __name__ == "__main__":
             # write live value to database
             db_sensors[hw_sensors[i].get_address()].set(value)
 
-        # log to CSV
-        if not csv_counter % 5 :
-            print(f"Append to {csv_path}")
-            with open(csv_path, 'a') as csv_file:
-                cols = [ts]
-                for i in range(0, len(hw_sensors)):
-                    cols.append(str(th[i].last_result()))
-                csv_file.write(','.join(cols) + '\n')
-        csv_counter +=1
-        
-        time.sleep(5)
+        time.sleep(0.5)

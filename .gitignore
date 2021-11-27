@@ -130,3 +130,9 @@ dmypy.json
 
 # Jetbrains
 .idea/
+
+# boiler project files
+/db/dbaccess
+/db/circular
+/plotter/img/
+/log/
