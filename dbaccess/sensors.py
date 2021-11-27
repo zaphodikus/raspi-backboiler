@@ -123,7 +123,11 @@ class DbSensor(DbBaseObject):
             values[self.LAST_LIVE] = datetime.datetime.now().strftime(DbSensorDatabase.db_timeformat)
         if name is not None:
             values[self.DISPLAY_NAME] = name
-        self._write_row_where(key=self.SENSOR_ADDRESS, value=self.address, values=values)
+        try:
+            self._write_row_where(key=self.SENSOR_ADDRESS, value=self.address, values=values)
+        except Exception as e:
+            print(e)
+            # TODO: log this out
 
     def stale(self):
         row = self.get()

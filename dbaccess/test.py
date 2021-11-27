@@ -37,6 +37,9 @@ class ThreadWithReturnValue(Thread):
     def wait_result(self, *args):
         Thread.join(self, *args)
         return self._return
+    
+    def last_result(self):
+        return self._return
 
 
 # temporary
@@ -133,8 +136,20 @@ if __name__ == "__main__":
     hw_sensors.append(humidity_sensor)
     db_sensors[spi_addr] = DbBMP280PressureSensor(db.get_connection(), spi_addr)
 
+    # CSV file
+    csv_path =  '../log/sensors.csv'
+    with open(csv_path, 'a') as csv_file:
+        cols = ['time']
+        for i in range(0, len(hw_sensors)):
+            cols.append(hw_sensors[i].get_address())
+        csv_file.write(','.join(cols) + '\n')
+
+    csv_counter = 0
     while True:
-        print(datetime.datetime.now().strftime("%H:%M:%S"))
+        ts = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
+        print(ts)
+
+            
         th = []
         for s in hw_sensors:
             th.append(ThreadWithReturnValue(target=s.get_sensor_value))
@@ -147,4 +162,15 @@ if __name__ == "__main__":
             print(f"Async read {hw_sensors[i].get_address():12} = {value}{hw_sensors[i].get_sensor_units()}")
             # write live value to database
             db_sensors[hw_sensors[i].get_address()].set(value)
+
+        # log to CSV
+        if csv_counter % 5 == 0:
+            print(f"Append to {csv_path}")
+            with open(csv_path, 'a') as csv_file:
+                cols = [ts]
+                for i in range(0, len(hw_sensors)):
+                    cols.append(str(th[i].last_result()))
+                csv_file.write(','.join(cols) + '\n')
+        csv_counter +=1
+        
         time.sleep(5)
