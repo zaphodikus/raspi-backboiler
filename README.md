@@ -77,6 +77,7 @@ todo: configuration notes
  sudo pip3 install --upgrade setuptools 
  pip3 install adafruit_blinka
  pip3 install psutil
+ pip3 install serial
  sudo pip3 install adafruit-circuitpython-bme280
  ```
 Data modules
@@ -88,7 +89,7 @@ Data modules
  pip3 install pandas
  pip3 install matplotlib
  pip3 install seaborn
- pip install flask
+ pip3 install flask
 ```
 Flask app setup
 ```
