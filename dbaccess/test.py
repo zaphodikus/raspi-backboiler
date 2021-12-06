@@ -41,7 +41,7 @@ class BMP280(TempSensor):
         print('Temperature: {} degrees C'.format(self.sensor.temperature))
 
     def get_sensor_value(self):
-        t = self.sensor.temperature
+        t = int(self.sensor.temperature*1000)/1000
         return t 
 
 
@@ -55,7 +55,7 @@ class BMP280H(TempSensor):
         print('Humidity: {}%'.format(self.sensor.humidity))
 
     def get_sensor_value(self):
-        h = self.sensor.humidity
+        h = int(self.sensor.humidity*1000)/1000
         return h 
 
     @staticmethod
@@ -73,7 +73,7 @@ class BMP280P(TempSensor):
         print('Pressure: {}hPa'.format(self.sensor.pressure))
 
     def get_sensor_value(self):
-        p = self.sensor.pressure
+        p = int(self.sensor.pressure*1000)/1000
         return p
 
     @staticmethod

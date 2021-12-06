@@ -1,9 +1,18 @@
 /* 
  ESP 8266 (NodeMCU ESP12E)
-  Sketch uses 269717 bytes (25%) of program storage space. Maximum is 1044464 bytes.
-  Global variables use 28188 bytes (34%) of dynamic memory, leaving 53732 bytes for local variables. Maximum is 81920 bytes.
 
- 
+A simple SPI to RS284 converter that provides us with some distance capability.
+
+Sketch reads the thermocouple, and sends the following string out on TTL port which goes onto RS485.
+|value   |meaning                |
+|----    |-----                  |
+|0x02    |START-OF-TELEGRAM      |
+|'5'     |sensor number (ASCII)  |
+|0x09    |END-OF-FIELD           |
+|'25.0'  |temperature (ASCII)    |
+|0x03    |END-OF-TELEGRAM        |
+
+Notes:
 Label GPIO  Input Output  Notes
 D0  GPIO16  no interrupt  no PWM or I2C support HIGH at boot
 used to wake up from deep sleep
@@ -22,6 +31,7 @@ TX  GPIO1 TX pin  OK  HIGH at boot
 debug output at boot, boot fails if pulled LOW
 A0  ADC0  Analog Input  X 
 
+Pins:
              +-ANT--+
       ADC0   +      + GPIO16 WAKE
       RES    +      + GPIO5  SCL
@@ -47,20 +57,12 @@ https://minimalmodbus.readthedocs.io/en/master/usage.html
 which requires https://minimalmodbus.readthedocs.io/en/master/installation.html
 
 FTDI-RS232 3V3
-GND
-CTS#
-VCC
-TXD
-RXD
-RTS#
-
-6 pin header 0.1in pitch
-BLACK
-BROWN 
-RED
-ORANGE
-YELLOW 
-GREEN
+GND   BLACK
+CTS#  BROWN
+VCC   RED
+TXD   ORANGE
+RXD   YELLOW
+RTS#  GREEN
 
 RS485 board:
 
@@ -71,6 +73,7 @@ RS485 board:
       + GnD
       + 3v3
 ------+
+
 */
 
 #include<SPI.h>
@@ -78,7 +81,7 @@ RS485 board:
 
 const int slaveAPin = D8;  // chip select
 const int rsEnPin = D1;    // RS422 enable
-// erial message simple farming
+// serial message simple farming
 const unsigned char START_TEXT = 0x02;
 const unsigned char END_FIELD = 0x09;
 const unsigned char END_TEXT = 0x03;
@@ -88,7 +91,10 @@ void setup() {
   // put your setup code here, to run once:
   WiFi.mode(WIFI_OFF);
   pinMode (slaveAPin, OUTPUT);
+  digitalWrite (slaveAPin, LOW);
   pinMode (rsEnPin, OUTPUT);
+  digitalWrite (rsEnPin, LOW);
+  SPI.beginTransaction(SPISettings(4000000, MSBFIRST, SPI_MODE0));
   SPI.begin();  /* begin SPI */
 
   Serial.begin(115200);
@@ -113,17 +119,22 @@ float ReadMax6675() {
   Serial.print(rawValue, HEX);
   Serial.println("]");
   //
-  if (rawValue& 0x04)
+  if ((rawValue& 0x04) || (0 == rawValue))
   { 
-    Serial.println("NAN");
-    SPI.transfer(0);
+    Serial.println("NAN/invalid");
+    rawValue = SPI.transfer(0);
+    Serial.print("EAT DATA[");
+    Serial.print(rawValue, HEX);
+    Serial.println("]");
+    return(-1.0);
+  }else {
+    rawValue >>=3;  // discard lowest 3 bits (status)
+    celcius = rawValue*0.25;
+    Serial.print(celcius, 3);
+    Serial.println(" celcius");
+  
+    return(celcius);
   }
-  rawValue >>=3;  // discard lowest 3 bits (status)
-  celcius = rawValue*0.25;
-  Serial.print(celcius, 3);
-  Serial.println(" celcius");
-
-  return(celcius);
 }
 
 // -------------------- calc_interval ------------------------------------------------
@@ -163,23 +174,5 @@ void loop() {
   float value = ReadMax6675();
 
   WriteTelegram(5, value);
-  //Serial1.print("AaAaAa");
-  //delay(500);
-  
-//  if (Serial.available()) {
-//    uint8_t ch;
-//    ch = Serial.read();
-//    Serial.write(ch);
-//    // forward terminal data to serial#1
-//    Serial1.write(ch);
-//  }
-//  // forwarded and looped on serial#1 ?
-//  if (Serial1.available()) {
-//      back = Serial1.read();
-//      Serial.print("==>");
-//      Serial.print(back);
-//      Serial.print("<==");
-//      Serial.println("got back");
-//    }
-
+  delay(200);
 }
