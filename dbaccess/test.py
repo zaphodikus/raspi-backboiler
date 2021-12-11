@@ -5,7 +5,8 @@
 #   1 second delay. So it helps, but not much to use a thread.
 #
 import sqlite3 as sql
-import datetime, time
+import datetime
+import time
 import os
 import sys
 from pathlib import Path
@@ -14,10 +15,12 @@ from sensors import DbDS18B20Sensor, DbMAX6675Sensor, DbSensorDatabase, \
     DbBMP280TemperatureSensor, DbBMP280HumiditySensor, DbBMP280PressureSensor
 
 from shared.thread.sensorthread import ThreadWithReturnValue
-from shared.sensorbase.sensorbase import TempSensor
+
 from shared.DS18B20.ds18b20 import DS18B20
 from shared.MAX6675.MAX6675 import MAX6675
+from shared.BMP280.BMP280 import BMP280, BMP280H, BMP280P
 from shared.sensor_config import SystemConfig
+
 # temporary
 from flasktest.raspberry.raspberry import is_raspberrypi
 if is_raspberrypi():
@@ -25,63 +28,8 @@ if is_raspberrypi():
     import busio
 
 
-if is_raspberrypi():
-    import digitalio
-    from adafruit_bme280 import basic as adafruit_bme280
-
-
-# todo: rename these and create a base class of some sort
-class BMP280(TempSensor):
-    def __init__(self, spi, cs_pin=board.D6):
-        super().__init__(f"spi_CSPIN_{cs_pin}T")  # use the CS pin as an SPI 'address'
-        self.spi = spi
-        self.device_path = f"T {cs_pin}" + self.get_address()
-        self.sensor = adafruit_bme280.Adafruit_BME280_SPI(spi, digitalio.DigitalInOut(cs_pin))
-
-        print('Temperature: {} degrees C'.format(self.sensor.temperature))
-
-    def get_sensor_value(self):
-        t = int(self.sensor.temperature*1000)/1000
-        return t 
-
-
-class BMP280H(TempSensor):
-    def __init__(self, spi, cs_pin=board.D6):
-        super().__init__(f"spi_CSPIN_{cs_pin}H")  # use the CS pin as an SPI 'address'
-        self.device_path = f"H {cs_pin}" + self.get_address()
-        self.spi = spi
-        self.sensor = adafruit_bme280.Adafruit_BME280_SPI(spi, digitalio.DigitalInOut(cs_pin))
-
-        print('Humidity: {}%'.format(self.sensor.humidity))
-
-    def get_sensor_value(self):
-        h = int(self.sensor.humidity*1000)/1000
-        return h 
-
-    @staticmethod
-    def get_sensor_units():
-        return r"%"
-
-
-class BMP280P(TempSensor):
-    def __init__(self, spi, cs_pin=board.D6):
-        super().__init__(f"spi_CSPIN_{cs_pin}P")  # use the CS pin as an SPI 'address'
-        self.device_path = f"P {cs_pin}" + self.get_address()
-        self.spi = spi
-        self.sensor = adafruit_bme280.Adafruit_BME280_SPI(spi, digitalio.DigitalInOut(cs_pin))
-
-        print('Pressure: {}hPa'.format(self.sensor.pressure))
-
-    def get_sensor_value(self):
-        p = int(self.sensor.pressure*1000)/1000
-        return p
-
-    @staticmethod
-    def get_sensor_units():
-        return r"hPa"
-
-
 if __name__ == "__main__":
+    print("Raspi-backboiler test app")
     if is_raspberrypi():
         # use the "live" DB on a ramdisk to save SD card
         db = DbSensorDatabase(db_root_path=SystemConfig.ramdisk_path)
@@ -101,7 +49,7 @@ if __name__ == "__main__":
     spi_bus = busio.SPI(board.SCLK, board.MOSI, board.MISO)
     while not spi_bus.try_lock():
         pass
-    spi_bus.configure(baudrate=4000000)  # 4MHz, chip can do 5MHz normally
+    spi_bus.configure(baudrate=3000000)  # 4MHz, chip can do 5MHz normally
     # Note: will run fine at 100KHz
     spi_bus.unlock()
 

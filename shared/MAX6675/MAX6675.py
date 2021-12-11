@@ -49,6 +49,15 @@ class MAX6675(TempSensor):
         return raw_val * 0.25
 
     def get_sensor_value(self):
+        tries = 5
+        while tries:
+            value = self.get_spi_senor_value()
+            if value != float('NaN') and value != 0 and value != 1024:
+                return value
+            tries -= 1
+            print(f"retry{5-tries} ")
+
+    def get_spi_senor_value(self):
         while not self.spi.try_lock():
             pass
         self.cs.value = False
