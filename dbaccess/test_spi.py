@@ -16,68 +16,14 @@ from sensors import DbMAX6675Sensor, DbSensorDatabase, \
 from shared.thread.sensorthread import ThreadWithReturnValue
 from shared.sensorbase.sensorbase import TempSensor
 from shared.MAX6675.MAX6675 import MAX6675
+from shared.BMP280.BMP280 import BMP280, BMP280H, BMP280P
 from shared.sensor_config import SystemConfig
+
 # temporary
 from flasktest.raspberry.raspberry import is_raspberrypi
 if is_raspberrypi():
     import board
     import busio
-
-
-if is_raspberrypi():
-    import digitalio
-    from adafruit_bme280 import basic as adafruit_bme280
-
-
-# todo: rename these and create a base class of some sort
-class BMP280(TempSensor):
-    def __init__(self, spi, cs_pin=board.D6):
-        super().__init__(f"spi_CSPIN_{cs_pin}T")  # use the CS pin as an SPI 'address'
-        self.spi = spi
-        self.device_path = f"T {cs_pin}" + self.get_address()
-        self.sensor = adafruit_bme280.Adafruit_BME280_SPI(spi, digitalio.DigitalInOut(cs_pin))
-
-        print('Temperature: {} degrees C'.format(self.sensor.temperature))
-
-    def get_sensor_value(self):
-        t = self.sensor.temperature
-        return t 
-
-
-class BMP280H(TempSensor):
-    def __init__(self, spi, cs_pin=board.D6):
-        super().__init__(f"spi_CSPIN_{cs_pin}H")  # use the CS pin as an SPI 'address'
-        self.device_path = f"H {cs_pin}" + self.get_address()
-        self.spi = spi
-        self.sensor = adafruit_bme280.Adafruit_BME280_SPI(spi, digitalio.DigitalInOut(cs_pin))
-
-        print('Humidity: {}%'.format(self.sensor.humidity))
-
-    def get_sensor_value(self):
-        h = self.sensor.humidity
-        return h 
-
-    @staticmethod
-    def get_sensor_units():
-        return r"%"
-
-
-class BMP280P(TempSensor):
-    def __init__(self, spi, cs_pin=board.D6):
-        super().__init__(f"spi_CSPIN_{cs_pin}P")  # use the CS pin as an SPI 'address'
-        self.device_path = f"P {cs_pin}" + self.get_address()
-        self.spi = spi
-        self.sensor = adafruit_bme280.Adafruit_BME280_SPI(spi, digitalio.DigitalInOut(cs_pin))
-
-        print('Pressure: {}hPa'.format(self.sensor.pressure))
-
-    def get_sensor_value(self):
-        p = self.sensor.pressure
-        return p
-
-    @staticmethod
-    def get_sensor_units():
-        return r"hPa"
 
 
 if __name__ == "__main__":
@@ -120,15 +66,6 @@ if __name__ == "__main__":
     hw_sensors.append(humidity_sensor)
     db_sensors[spi_addr] = DbBMP280PressureSensor(db.get_connection(), spi_addr)
 
-    # CSV file
-    csv_path = '../log/sensors.csv'
-    with open(csv_path, 'a') as csv_file:
-        cols = ['time']
-        for i in range(0, len(hw_sensors)):
-            cols.append(hw_sensors[i].get_address())
-        csv_file.write(','.join(cols) + '\n')
-
-    csv_counter = 0
     while True:
         ts = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
         print(ts)
@@ -146,4 +83,3 @@ if __name__ == "__main__":
             # write live value to database
             db_sensors[hw_sensors[i].get_address()].set(value)
 
-        time.sleep(0.5)
