@@ -70,16 +70,19 @@ if __name__ == "__main__":
         ts = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
         print(ts)
 
-        th = []
-        for s in hw_sensors:
-            th.append(ThreadWithReturnValue(target=s.get_sensor_value))
-            th[len(th)-1].start()
-        for i in range(0, len(hw_sensors)):
-            #
-            start = time.time()
-            value = th[i].wait_result()
-            end = time.time()
-            print(f"Async read {hw_sensors[i].get_address():12} = {value}{hw_sensors[i].get_sensor_units()}")
-            # write live value to database
-            db_sensors[hw_sensors[i].get_address()].set(value)
-
+        i=5
+        value = hw_sensors[i].get_spi_senor_value()
+        print(f"Sync read {hw_sensors[i].get_address():12} = {value}{hw_sensors[i].get_sensor_units()}")
+        # th = []
+        # for s in hw_sensors:
+        #     th.append(ThreadWithReturnValue(target=s.get_sensor_value))
+        #     th[len(th)-1].start()
+        # for i in range(0, len(hw_sensors)):
+        #     #
+        #     start = time.time()
+        #     value = th[i].wait_result()
+        #     end = time.time()
+        #     print(f"Async read {hw_sensors[i].get_address():12} = {value}{hw_sensors[i].get_sensor_units()}")
+        #     # write live value to database
+        #     db_sensors[hw_sensors[i].get_address()].set(value)
+        #
