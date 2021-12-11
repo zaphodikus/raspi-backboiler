@@ -1,3 +1,4 @@
+import math
 import board
 #import busio
 import digitalio
@@ -52,7 +53,7 @@ class MAX6675(TempSensor):
         tries = 5
         while tries:
             value = self.get_spi_senor_value()
-            if value != float('NaN') and value != 0 and value != 1024:
+            if not math.isnan(value) and 0 < value < 600:
                 return value
             tries -= 1
             print(f"retry{5-tries} ")
