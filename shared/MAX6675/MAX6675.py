@@ -57,6 +57,7 @@ class MAX6675(TempSensor):
                 return value
             tries -= 1
             print(f"retry{5-tries} ")
+        return 0
 
     def get_spi_senor_value(self):
         while not self.spi.try_lock():
