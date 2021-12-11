@@ -50,28 +50,28 @@ if __name__ == "__main__":
     hw_sensors.append(thermocouple)
     db_sensors[spi_addr] = DbMAX6675Sensor(db.get_connection(), spi_addr)
 
-    temp_sensor = BMP280(spi_bus)  # default CS GPIO 6
-    spi_addr = temp_sensor.get_address()
-    print(f"BMP280(T) address : {spi_addr}")
-    hw_sensors.append(temp_sensor)
-    db_sensors[spi_addr] = DbBMP280TemperatureSensor(db.get_connection(), spi_addr)
-    pressure_sensor = BMP280P(spi_bus)  # default CS GPIO 6
-    spi_addr = pressure_sensor.get_address()
-    print(f"BMP280(P) address : {spi_addr}")
-    hw_sensors.append(pressure_sensor)
-    db_sensors[spi_addr] = DbBMP280HumiditySensor(db.get_connection(), spi_addr)
-    humidity_sensor = BMP280H(spi_bus)  # default CS GPIO 6
-    spi_addr = humidity_sensor.get_address()
-    print(f"BMP280(P) address : {spi_addr}")
-    hw_sensors.append(humidity_sensor)
-    db_sensors[spi_addr] = DbBMP280PressureSensor(db.get_connection(), spi_addr)
+#    temp_sensor = BMP280(spi_bus)  # default CS GPIO 6
+#    spi_addr = temp_sensor.get_address()
+#    print(f"BMP280(T) address : {spi_addr}")
+#    hw_sensors.append(temp_sensor)
+#    db_sensors[spi_addr] = DbBMP280TemperatureSensor(db.get_connection(), spi_addr)
+#    pressure_sensor = BMP280P(spi_bus)  # default CS GPIO 6
+#    spi_addr = pressure_sensor.get_address()
+#    print(f"BMP280(P) address : {spi_addr}")
+#    hw_sensors.append(pressure_sensor)
+#    db_sensors[spi_addr] = DbBMP280HumiditySensor(db.get_connection(), spi_addr)
+#    humidity_sensor = BMP280H(spi_bus)  # default CS GPIO 6
+#    spi_addr = humidity_sensor.get_address()
+#    print(f"BMP280(P) address : {spi_addr}")
+#    hw_sensors.append(humidity_sensor)
+#    db_sensors[spi_addr] = DbBMP280PressureSensor(db.get_connection(), spi_addr)
 
     while True:
         ts = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
-        print(ts)
+        #print(ts)
 
-        i=5
-        value = hw_sensors[i].get_spi_senor_value()
+        i=0
+        value = hw_sensors[i].get_sensor_value()
         print(f"Sync read {hw_sensors[i].get_address():12} = {value}{hw_sensors[i].get_sensor_units()}")
         # th = []
         # for s in hw_sensors:

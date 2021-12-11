@@ -1,9 +1,7 @@
 import math
 import board
-#import busio
+import time
 import digitalio
-#import time
-#import sys
 from shared.DS18B20.ds18b20 import TempSensor
 
 
@@ -39,8 +37,8 @@ class MAX6675(TempSensor):
             return float('NaN')
         # Check if signed bit is set.
         if raw_val & 0x80000000:
-        # Negative value, take 2's compliment. Compute this with subtraction
-        # because python is a little odd about handling signed/unsigned.
+            # Negative value, take 2's compliment. Compute this with subtraction
+            # because python is a little odd about handling signed/unsigned.
             raw_val >>= 3 # only need the 12 MSB
             raw_val -= 4096
         else:
@@ -52,14 +50,14 @@ class MAX6675(TempSensor):
     def get_sensor_value(self):
         tries = 5
         while tries:
-            value = self.get_spi_senor_value()
+            value = self.get_spi_sensor_value()
             if not math.isnan(value) and 0 < value < 600:
                 return value
             tries -= 1
             print(f"retry{5-tries} ")
         return 0
 
-    def get_spi_senor_value(self):
+    def get_spi_sensor_value(self):
         while not self.spi.try_lock():
             pass
         self.cs.value = False
@@ -67,9 +65,8 @@ class MAX6675(TempSensor):
         self.cs.value = True
         self.spi.unlock()
         
-        if self.raw is None or len(self.raw) != 2:
-            raise RuntimeError('Did not read expected number of bytes from device!')
         value = self.raw[0] << 8 | self.raw[1]
-        # print('Raw value: 0x{0:08X}'.format(value & 0xFFFFFFFF))
+        #print('Raw value: 0x{0:08X}'.format(value & 0xFFFFFFFF))
+
         # convert to a temperature
         return self.convert_celcius(value)
